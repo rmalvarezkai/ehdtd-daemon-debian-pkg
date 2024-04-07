@@ -1,0 +1,54 @@
+#!/bin/bash
+
+REALPATH=/usr/bin/realpath
+BASENAME=/usr/bin/basename
+RM=/usr/bin/rm
+ECHO=/usr/bin/echo
+PYTHON=/usr/bin/python3
+
+#############################################################################
+LIB_PATH="/usr/lib/ehdtd-daemon"
+BIN_PATH="/usr/sbin"
+VIRT_ENV_NAME="ehdtd-daemon-virtenv"
+EHDTD_DAEMON_MAKE_VENV=ehdtd-daemon-make-venv
+EXEC_PY="ehdtd_daemon"
+#############################################################################
+THIS_SCRIPT=${BIN_PATH}/`${BASENAME} $0`
+REAL_PATH=`${REALPATH} "$0"`
+ROOT_DIR=${REAL_PATH:0:-${#THIS_SCRIPT}}
+LIB_PATH="${ROOT_DIR}${LIB_PATH}"
+EHDTD_DAEMON_MAKE_VENV="${ROOT_DIR}${BIN_PATH}/${EHDTD_DAEMON_MAKE_VENV}"
+ACTIVATE_FILE="${LIB_PATH}/${VIRT_ENV_NAME}/bin/activate"
+DEFAULT_FILE=/etc/default/ehdtd-daemon
+#############################################################################
+
+ENABLE=no
+
+if [ -f ${DEFAULT_FILE} ]
+then
+    . ${DEFAULT_FILE}
+fi
+
+if ! [ "${ENABLE}" = "yes" ]
+then
+    ${ECHO} "Daemon is disabled please check ${DEFAULT_FILE} file."
+    exit 0
+fi
+
+if ! [ -f ${ACTIVATE_FILE} ]
+then
+    ${EHDTD_DAEMON_MAKE_VENV}
+fi
+
+if [ -f ${ACTIVATE_FILE} ]
+then
+    source ${ACTIVATE_FILE}
+    ${EXEC_PY} $@
+    RET=$?
+    deactivate
+else
+    ${ECHO} "Virtualenv is not created"
+    exit 1
+fi
+
+exit ${RET}

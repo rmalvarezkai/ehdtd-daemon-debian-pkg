@@ -1,0 +1,46 @@
+#!/bin/bash
+
+REALPATH=/usr/bin/realpath
+BASENAME=/usr/bin/basename
+RM=/bin/rm
+PYTHON=/usr/bin/python3
+
+#############################################################################
+LIB_PATH="/usr/lib/ehdtd-daemon"
+BIN_PATH="/usr/sbin"
+VIRT_ENV_NAME="ehdtd-daemon-virtenv"
+EXEC_PY="ehdtd_daemon"
+#############################################################################
+THIS_SCRIPT=${BIN_PATH}/`${BASENAME} $0`
+REAL_PATH=`${REALPATH} "$0"`
+ROOT_DIR=${REAL_PATH:0:-${#THIS_SCRIPT}}
+LIB_PATH="${ROOT_DIR}${LIB_PATH}"
+ACTIVATE_FILE="${LIB_PATH}/${VIRT_ENV_NAME}/bin/activate"
+#############################################################################
+
+ACTION=$1
+
+if [ -z "${ACTION}" ]
+then
+    ACTION=reinstall
+fi
+
+cd ${LIB_PATH}
+
+if [ "${ACTION}" = "reinstall" ]
+then
+    ${RM} -f -r ${VIRT_ENV_NAME}
+fi
+
+if ! [ -d ${VIRT_ENV_NAME} ]
+then
+    ${PYTHON} -m venv ${VIRT_ENV_NAME}
+fi
+
+cd /
+
+source ${ACTIVATE_FILE}
+pip install -q --upgrade pip setuptools
+pip install -q --upgrade ehdtd-daemon
+deactivate
+

@@ -1,0 +1,10 @@
+coreutils
+bash
+lsb-base
+lsb-release
+fakeroot
+rpl
+git
+python3
+python3-venv
+pipx

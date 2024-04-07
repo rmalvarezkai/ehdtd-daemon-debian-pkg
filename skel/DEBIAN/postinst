@@ -1,0 +1,135 @@
+#!/bin/bash
+
+RPL=/usr/bin/rpl
+CP=/bin/cp
+RM=/bin/rm
+CHOWN=/bin/chown
+CHMOD=/bin/chmod
+MKDIR=/bin/mkdir
+LN=/bin/ln
+CAT=/bin/cat
+ECHO=/bin/echo
+MKTEMP=/bin/mktemp
+PWGEN=/usr/bin/pwgen
+SYSTEMCTL=/bin/systemctl
+
+####################################################################################
+
+dir_perms()
+{
+    directorio=$1
+    usuario=$2
+    grupo=$3
+    p_archivo=$4
+    p_directorio=$5
+    if [ -d ${directorio} ]
+    then
+        ${CHOWN} -R ${usuario}:${grupo} ${directorio}
+        ${CHMOD} ${p_directorio} ${directorio}
+        ${FIND} ${directorio} -type d -exec chmod $p_directorio {} \;
+        ${FIND} ${directorio} -type f -exec chmod $p_archivo {} \;
+    else
+        ${MKDIR} -p ${directorio}
+        ${CHOWN} -R ${usuario}:${grupo} ${directorio}
+        ${CHMOD} ${p_directorio} ${directorio}
+    fi
+}
+
+configure_ehdtd_daemon()
+{
+    ${RM} -f -r ${VIRT_ENV_PATH}
+
+    if ! [ -f ${DEFAULT_FILE} ]
+    then
+        ${CP} -f ${DEFAULT_FILE_SKEL} ${DEFAULT_FILE}
+        ${CHOWN} root:root ${DEFAULT_FILE}
+        ${CHMOD} 0644 ${DEFAULT_FILE}
+    fi
+
+    if [ -d /run/systemd/system ]
+    then
+        if ! ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
+        then
+            ${SYSTEMCTL} enable ${SYSTEMD_PATH} || return $?
+        fi
+    fi
+}
+
+####################################################################################
+
+SOFT_NAME=__SOFT_NAME__
+LIB_DIR=/usr/lib/${SOFT_NAME}
+SYSTEMD_SERVICE=${SOFT_NAME}.service
+SYSTEMD_PATH=${LIB_DIR}/systemd/${SYSTEMD_SERVICE}
+VIRT_ENV_NAME="ehdtd-daemon-virtenv"
+VIRT_ENV_PATH=${LIB_DIR}/${VIRT_ENV_NAME}
+DEFAULT_FILE=/etc/default/${SOFT_NAME}
+DEFAULT_FILE_SKEL=/usr/share/${SOFT_NAME}/config-skels/${SOFT_NAME}.default
+
+####################################################################################
+
+if [ -f /usr/share/debconf/confmodule ]
+then
+    . /usr/share/debconf/confmodule
+fi
+
+configure_ehdtd_daemon
+
+if [ -f /usr/share/dbconfig-common/dpkg/postinst ]; then
+    . /usr/share/dbconfig-common/dpkg/postinst
+    # dbc_createdb_encoding="UTF8"
+    dbc_generate_include_args="--ucf -o template_infile='/usr/share/${SOFT_NAME}/config-skels/${SOFT_NAME}-config.yaml'"
+    dbc_generate_include=template:/etc/${SOFT_NAME}/${SOFT_NAME}-config.yaml
+    dbc_generate_include_owner=root:root
+    dbc_generate_include_perms=0640
+    dbc_go ${SOFT_NAME} "$@"
+fi
+
+if [ "$1" = "configure" ]
+then
+  if [ -n "$2" ]
+  then
+    if [ -d /run/systemd/system ]
+    then
+        if ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
+        then
+            ${SYSTEMCTL} daemon-reload
+            ${SYSTEMCTL} start ${SYSTEMD_SERVICE} || return $?
+        fi
+    fi
+  else
+    if [ -d /run/systemd/system ]
+    then
+        if ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
+        then
+            ${SYSTEMCTL} daemon-reload
+            ${SYSTEMCTL} start ${SYSTEMD_SERVICE} || return $?
+        fi
+    fi
+  fi
+fi
+
+if [ "$1" = "install" ]
+then
+    if [ -d /run/systemd/system ]
+    then
+        if ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
+        then
+            ${SYSTEMCTL} daemon-reload
+            ${SYSTEMCTL} start ${SYSTEMD_SERVICE} || return $?
+        fi
+    fi
+fi
+
+if [ "$1" = "upgrade" ]
+then
+    if [ -d /run/systemd/system ]
+    then
+        if ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
+        then
+            ${SYSTEMCTL} daemon-reload
+            ${SYSTEMCTL} start ${SYSTEMD_SERVICE} || return $?
+        fi
+    fi
+fi
+

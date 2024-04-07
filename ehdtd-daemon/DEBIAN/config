@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Install / upgrade database.
+
+set -e
+
+SOFT_NAME=ehdtd-daemon
+
+if [ -f /usr/share/debconf/confmodule ]
+then
+    . /usr/share/debconf/confmodule
+fi
+
+if [ -f /usr/share/dbconfig-common/dpkg/config ]; then
+
+	dbc_dbtypes="mysql, pgsql"
+	# dbc_authmethod_user="password"
+	# dbc_dbserver="localhost"
+	dbc_dbname="ehdtd"
+	dbc_dbuser="ehdtd"
+	# dbc_ssl="true"
+	# dbc_load_include="template:${ROOT_DIR}usr/share/${SOFT_NAME}/config-skels/${SOFT_NAME}-config.yaml"
+
+	. /usr/share/dbconfig-common/dpkg/config
+	dbc_go ${SOFT_NAME} "$@"
+fi
+
+exit 0

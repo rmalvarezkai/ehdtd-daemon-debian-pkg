@@ -1,0 +1,13 @@
+[Unit]
+Description=Ehdtd Daemon
+After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash /usr/sbin/ehdtd-daemon start
+ExecStop=/bin/bash /usr/sbin/ehdtd-daemon stop
+TimeoutStartSec=950
+TimeoutStopSec=950
+[Install]
+WantedBy=multi-user.target
+
