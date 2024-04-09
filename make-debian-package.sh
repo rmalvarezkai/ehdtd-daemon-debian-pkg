@@ -26,14 +26,57 @@ HEAD=/usr/bin/head
 SED=/usr/bin/sed
 SORT=/usr/bin/sort
 BASH=/bin/bash
-PYTHON=/usr/bin/python3
-PIPX=/usr/bin/pipx
 PWD=/usr/bin/pwd
-CHROOT=/usr/sbin/chroot
 FAKEROOT=/usr/bin/fakeroot
+SU=/usr/bin/su
+SUDO=/usr/bin/sudo
 LSB_RELEASE=/usr/bin/lsb_release
 
 #######################################################################################################################################
+
+download_build_deps()
+{
+    TO_INSTALL=""
+    RET=0
+    for build_pkg in `${CAT} ${BUILD_DEPENDS_FILE}`
+    do
+        if ! ${DPKG} -s ${build_pkg} 1>/dev/null 2>/dev/null
+        then
+            TO_INSTALL="${TO_INSTALL} ${build_pkg}"
+        fi
+    done
+
+    if [ -n "${TO_INSTALL}" ]
+    then
+        if [ "${EUID}" = "0" ]
+        then
+            ${APT_GET} -f -y install ${TO_INSTALL}
+            RET=$?
+        else
+            if [ -f ${SUDO} ]
+            then
+                ${SUDO} ${APT_GET} -f -y install ${TO_INSTALL}
+                RET=$?
+            elif [ -f ${SU} ]
+            then
+                ${SU} -c "${APT_GET} -f -y install ${TO_INSTALL}"
+                RET=$?
+            else
+                ${ECHO} "Please install these packages: ${TO_INSTALL}, with the following command"
+                ${ECHO} "${APT_GET} -f -y install ${TO_INSTALL}"
+                RET=1
+            fi
+        fi
+    fi
+
+    if ! [ "${RET}" = "0" ]
+    then
+        exit ${RET}
+    fi
+
+    return ${RET}
+}
+
 get_last_release()
 {
     L_GIT_SERVER=$1
@@ -55,6 +98,7 @@ get_last_release()
 
 #######################################################################################################################################
 ## Edit this values
+SCRIPT_VERSION=0.1.0
 GIT_SERVER=https://github.com/rmalvarezkai/ehdtd_daemon
 SRC_DIR=ehdtd-daemon-src
 
@@ -62,7 +106,6 @@ SOFT_NAME=ehdtd-daemon
 SOFT_DIR=ehdtd-daemon
 SOFT_ARCH=amd64
 DEST_DIR=dist
-FILE_VERSION=${DEST_DIR}/VERSION
 
 SOFT_NAME_RPL=__SOFT_NAME__
 VIRT_ENV_NAME="${SOFT_NAME}-virtenv"
@@ -71,11 +114,19 @@ LOG_DIR=/var/log/${SOFT_NAME}
 DOC_DIR=/usr/share/doc/${SOFT_NAME}
 SHARE_DIR=/usr/share/${SOFT_NAME}
 SKEL_DIR=skel
-BUILD_DEPENDS_FILE=${skel}/build-depends.txt
+BUILD_DEPENDS_FILE=${SKEL_DIR}/build-depends.txt
 #######################################################################################################################################
 
-DIST_ID=`${LSB_RELEASE} -s -i`
-DIST_CODENAME=`${LSB_RELEASE} -s -c`
+DIST_ID=`${LSB_RELEASE} -s -i 2>/dev/null`
+DIST_CODENAME=`${LSB_RELEASE} -s -c 2>/dev/null` # Only tested for bullseye and bookworm
+
+if [ -n "$1" ]
+then
+    DIST_CODENAME=$1
+fi
+
+FILE_VERSION=${DEST_DIR}/VERSION_${DIST_CODENAME}
+SERIAL_FILE="${DEST_DIR}/${DIST_CODENAME}-serial.txt"
 
 ${ECHO} "Making ${SOFT_NAME} debian package"
 
@@ -83,6 +134,8 @@ CURRENT_DIR=`${PWD}`
 
 SOFT_VERSION_PREV=NONE
 SOFT_VERSION=NONE
+
+download_build_deps
 
 BRANCH=`get_last_release ${GIT_SERVER}`
 
@@ -108,7 +161,7 @@ if [ "${SOFT_VERSION}" = "${SOFT_VERSION_PREV}" ]
 then
     ${ECHO} "Nothing to do"
 else
-    ${RM} -f ${DEST_DIR}/*.deb
+    ${RM} -f ${DEST_DIR}/*~${DIST_ID}~${DIST_CODENAME}_${SOFT_ARCH}.deb
 
     ${GIT} clone -q -b ${BRANCH} ${GIT_SERVER} ${SRC_DIR} 1>/dev/null 2>/dev/null
     if ! [ "$?" = "0" ]
@@ -133,8 +186,14 @@ else
         ${RM} -f -r ${SOFT_DIR}/etc/${SOFT_NAME}
     fi
 
+    if [ -d ${SOFT_DIR}/etc/logrotate.d ]
+    then
+        ${RM} -f -r ${SOFT_DIR}/etc/logrotate.d
+    fi
+
     ${MKDIR} -p ${SOFT_DIR}/etc/${SOFT_NAME}
     # ${ECHO} "" > ${SOFT_DIR}/etc/${SOFT_NAME}/${SOFT_NAME}-config.yaml
+    ${MKDIR} -p ${SOFT_DIR}/etc/logrotate.d
 
     cd ${SRC_DIR}
 
@@ -147,6 +206,7 @@ else
     cd ..
 
     ${CAT} ${SKEL_DIR}/conf/${SOFT_NAME}.default > ${SOFT_DIR}${SHARE_DIR}/config-skels/${SOFT_NAME}.default
+    ${CAT} ${SKEL_DIR}/conf/${SOFT_NAME}.logrotate > ${SOFT_DIR}${SHARE_DIR}/config-skels/${SOFT_NAME}.logrotate
 
     if [ -d ${SRC_DIR} ]
     then
@@ -165,13 +225,13 @@ else
 
     BUILD_NUM=0
 
-    if [ -f "${DEST_DIR}/serial.txt" ]
+    if [ -f "${SERIAL_FILE}" ]
     then
-	    BUILD_NUM=`${CAT} ${DEST_DIR}/serial.txt`
+	    BUILD_NUM=`${CAT} ${SERIAL_FILE}`
     fi
 
     BUILD_NUM=$[ ${BUILD_NUM} + 1 ]
-    ${ECHO} ${BUILD_NUM} > ${DEST_DIR}/serial.txt
+    ${ECHO} ${BUILD_NUM} > ${SERIAL_FILE}
 
     SOFT_VERSION=${SOFT_VERSION}-b${BUILD_NUM}~${DIST_ID}~${DIST_CODENAME}
 

@@ -46,6 +46,10 @@ configure_ehdtd_daemon()
         ${CHMOD} 0644 ${DEFAULT_FILE}
     fi
 
+    ${CAT} ${LOGROTATE_FILE_SKEL} > ${LOGROTATE_FILE}
+    ${CHOWN} root:root ${LOGROTATE_FILE}
+    ${CHMOD} 0644 ${LOGROTATE_FILE}
+
     if [ -d /run/systemd/system ]
     then
         if ! ${SYSTEMCTL} is-enabled ${SYSTEMD_SERVICE} 1>/dev/null 2>/dev/null
@@ -65,6 +69,8 @@ VIRT_ENV_NAME="ehdtd-daemon-virtenv"
 VIRT_ENV_PATH=${LIB_DIR}/${VIRT_ENV_NAME}
 DEFAULT_FILE=/etc/default/${SOFT_NAME}
 DEFAULT_FILE_SKEL=/usr/share/${SOFT_NAME}/config-skels/${SOFT_NAME}.default
+LOGROTATE_FILE=/etc/logrotate.d/${SOFT_NAME}
+LOGROTATE_FILE_SKEL=/usr/share/${SOFT_NAME}/config-skels/${SOFT_NAME}.logrotate
 
 ####################################################################################
 

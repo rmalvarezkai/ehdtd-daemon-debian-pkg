@@ -1,0 +1,21 @@
+
+/var/log/ehdtd-daemon/*.log {
+    create 0640 root root
+    missingok
+    daily
+    rotate 9
+    size 4M
+    notifempty
+    compress
+}
+
+/var/log/ehdtd-daemon/*.err {
+    create 0640 root root
+    missingok
+    daily
+    rotate 9
+    size 4M
+    notifempty
+    compress
+}
+

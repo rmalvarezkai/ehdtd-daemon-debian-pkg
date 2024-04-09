@@ -1,11 +1,11 @@
 Package: ehdtd-daemon
-Version: 0.1.8-b24~Debian~bullseye
+Version: 0.1.8-b1~Debian~bookworm
 Architecture: amd64
 Maintainer: Ricardo Marcelo Alvarez <rmalvarezkai@gmail.com>
-Pre-Depends: coreutils, bash, rpl, jq, python3, python3-venv, dbconfig-pgsql | dbconfig-mysql | dbconfig-no-thanks, dbconfig-common
+Pre-Depends: coreutils, bash, lsb-release, rpl, python3, python3-venv, dbconfig-pgsql | dbconfig-mysql | dbconfig-no-thanks, dbconfig-common
 Suggests: postgresql | mariadb-server
 Section: non-free/misc
 Priority: optional
-Installed-Size: 144
+Installed-Size: 152
 Homepage: https://github.com/rmalvarezkai/ehdtd_daemon
 Description: Daemon script for the ehdtd python package

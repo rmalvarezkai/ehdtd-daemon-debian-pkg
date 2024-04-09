@@ -19,11 +19,13 @@ UPDATE_RC_D=/usr/sbin/update-rc.d
 ####################################################################################
 SOFT_NAME=ehdtd-daemon
 LIB_DIR=/usr/lib/${SOFT_NAME}
+LOG_DIR=/var/log/${SOFT_NAME}
 SYSTEMD_SERVICE=${SOFT_NAME}.service
 SYSTEMD_PATH=${LIB_DIR}/systemd/${SYSTEMD_SERVICE}
 VIRT_ENV_NAME="ehdtd-daemon-virtenv"
 VIRT_ENV_PATH=${LIB_DIR}/${VIRT_ENV_NAME}
 DEFAULT_FILE=/etc/default/${SOFT_NAME}
+LOGROTATE_FILE=/etc/logrotate.d/${SOFT_NAME}
 ####################################################################################
 
 if [ -f /usr/share/debconf/confmodule ]
@@ -60,9 +62,11 @@ then
         ucf --purge /etc/${SOFT_NAME}/${SOFT_NAME}-config.yaml
     fi
 
+    ${RM} -r -f ${LOG_DIR} 1>/dev/null 2>/dev/null
     ${RM} -r -f ${LIB_DIR} 1>/dev/null 2>/dev/null
     ${RM} -r -f /etc/${SOFT_NAME} 1>/dev/null 2>/dev/null
     ${RM} -f ${DEFAULT_FILE} 1>/dev/null 2>/dev/null
+    ${RM} -f ${LOGROTATE_FILE} 1>/dev/null 2>/dev/null
 fi
 
 
