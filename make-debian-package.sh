@@ -279,10 +279,5 @@ else
     ${ECHO} "Creating debian package in ${DEB_NAME_OUT}"
     ${FAKEROOT} ${DPKG} -b ${SOFT_DIR} ${DEB_NAME_OUT}
 
-    if [ -d ${VIRTENV_DIR} ]
-    then
-        ${RM} -f -r ${VIRTENV_DIR}
-    fi
-
     ${ECHO} "Ready."
 fi
