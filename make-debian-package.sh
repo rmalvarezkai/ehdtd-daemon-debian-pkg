@@ -161,7 +161,7 @@ if [ "${SOFT_VERSION}" = "${SOFT_VERSION_PREV}" ]
 then
     ${ECHO} "Nothing to do"
 else
-    ${RM} -f ${DEST_DIR}/*~${DIST_ID}~${DIST_CODENAME}_${SOFT_ARCH}.deb
+    ${RM} -f ${SOFT_NAME}_*~${DIST_ID}~${DIST_CODENAME}_${SOFT_ARCH}.deb
 
     ${GIT} clone -q -b ${BRANCH} ${GIT_SERVER} ${SRC_DIR} 1>/dev/null 2>/dev/null
     if ! [ "$?" = "0" ]
@@ -266,7 +266,7 @@ else
     ${CHMOD} 0775 ${FILE_OUT}
 
     SIZE=`${DU} -k -s ${SOFT_DIR}`
-    DEB_NAME_OUT=${DEST_DIR}/${SOFT_NAME}_${SOFT_VERSION}_${SOFT_ARCH}.deb
+    DEB_NAME_OUT=${SOFT_NAME}_${SOFT_VERSION}_${SOFT_ARCH}.deb
 
     FILE_IN=${SKEL_DIR}/DEBIAN/control
     FILE_OUT=${SOFT_DIR}/DEBIAN/control
@@ -276,6 +276,7 @@ else
     ${RPL} ${SOFT_NAME_RPL} ${SOFT_NAME} ${FILE_OUT} 1>/dev/null
     ${CHMOD} 0644 ${FILE_OUT}
 
+    ${ECHO} "Creating debian package in ${DEB_NAME_OUT}"
     ${FAKEROOT} ${DPKG} -b ${SOFT_DIR} ${DEB_NAME_OUT}
 
     if [ -d ${VIRTENV_DIR} ]
