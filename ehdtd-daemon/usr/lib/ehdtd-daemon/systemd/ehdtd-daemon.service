@@ -6,8 +6,8 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=/bin/bash /usr/sbin/ehdtd-daemon start
 ExecStop=/bin/bash /usr/sbin/ehdtd-daemon stop
-TimeoutStartSec=950
-TimeoutStopSec=950
+TimeoutStartSec=320
+TimeoutStopSec=320
 [Install]
 WantedBy=multi-user.target
 
