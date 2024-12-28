@@ -98,7 +98,7 @@ get_last_release()
 
 #######################################################################################################################################
 ## Edit this values
-SCRIPT_VERSION=0.1.0
+SCRIPT_VERSION=0.1.4
 GIT_SERVER=https://github.com/rmalvarezkai/ehdtd_daemon
 SRC_DIR=ehdtd-daemon-src
 
@@ -201,7 +201,7 @@ else
     ${CAT} README.md > ../${SOFT_DIR}${DOC_DIR}/README.md
     ${CAT} LICENSE > ../${SOFT_DIR}${DOC_DIR}/LICENSE
     ${CAT} pyproject.toml > ../${SOFT_DIR}${DOC_DIR}/pyproject.toml
-    ${CAT} etc/${SOFT_DIR}/${SOFT_NAME}-config-sample.yaml > ../${SOFT_DIR}${SHARE_DIR}/config-skels/${SOFT_NAME}-config.yaml
+    ${CAT} ehdtd_daemon/etc/${SOFT_DIR}/${SOFT_NAME}-config-sample.yaml > ../${SOFT_DIR}${SHARE_DIR}/config-skels/${SOFT_NAME}-config.yaml
 
     cd ..
 
