@@ -98,7 +98,7 @@ get_last_release()
 
 #######################################################################################################################################
 ## Edit this values
-SCRIPT_VERSION=0.2.7
+SCRIPT_VERSION=0.2.8
 GIT_SERVER=https://github.com/rmalvarezkai/ehdtd_daemon
 SRC_DIR=ehdtd-daemon-src
 
@@ -141,7 +141,7 @@ BRANCH=`get_last_release ${GIT_SERVER}`
 
 if [ "$?" = "0" ]
 then
-    SOFT_VERSION=${BRANCH}
+    SOFT_VERSION=`${ECHO} ${BRANCH} | ${SED} 's/[a-zA-Z]//g'`
 else
     ${ECHO} "Error getting last release version"
     exit 1
