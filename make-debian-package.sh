@@ -98,7 +98,7 @@ get_last_release()
 
 #######################################################################################################################################
 ## Edit this values
-SCRIPT_VERSION=0.2.3
+SCRIPT_VERSION=0.2.5
 GIT_SERVER=https://github.com/rmalvarezkai/ehdtd_daemon
 SRC_DIR=ehdtd-daemon-src
 
@@ -149,8 +149,6 @@ if ! [ -d "${DEST_DIR}" ]
 then
     ${MKDIR} -p ${DEST_DIR}
 fi
-
-SOFT_VERSION=`${ECHO} ${BRANCH} | ${SED} 's/[a-zA-Z]//g'`
 
 if [ -f ${FILE_VERSION} ]
 then
