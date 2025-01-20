@@ -98,7 +98,7 @@ get_last_release()
 
 #######################################################################################################################################
 ## Edit this values
-SCRIPT_VERSION=0.1.4
+SCRIPT_VERSION=0.2.3
 GIT_SERVER=https://github.com/rmalvarezkai/ehdtd_daemon
 SRC_DIR=ehdtd-daemon-src
 

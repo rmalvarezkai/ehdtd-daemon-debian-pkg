@@ -1,5 +1,7 @@
 [Unit]
 Description=Ehdtd Daemon
+Requires=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
+Wants=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
 After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
 [Service]
 Type=oneshot
