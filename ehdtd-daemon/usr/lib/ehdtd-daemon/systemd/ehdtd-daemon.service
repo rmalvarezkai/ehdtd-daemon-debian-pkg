@@ -6,8 +6,8 @@ After=network.target NetworkManager.service NetworkManager-wait-online.service n
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/bash /usr/sbin/ehdtd-daemon start
-ExecStop=/bin/bash /usr/sbin/ehdtd-daemon stop
+ExecStart=/usr/sbin/ehdtd-daemon start
+ExecStop=/usr/sbin/ehdtd-daemon stop
 TimeoutStartSec=320
 TimeoutStopSec=320
 [Install]
