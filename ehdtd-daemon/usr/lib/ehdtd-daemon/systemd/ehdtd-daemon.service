@@ -1,8 +1,8 @@
 [Unit]
 Description=Ehdtd Daemon
 Requires=network.target networking.service
-Wants=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
-After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service
+Wants=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice
+After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice
 [Service]
 Type=oneshot
 RemainAfterExit=yes
@@ -12,4 +12,3 @@ TimeoutStartSec=320
 TimeoutStopSec=320
 [Install]
 WantedBy=multi-user.target
-
