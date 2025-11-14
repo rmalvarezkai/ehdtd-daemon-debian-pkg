@@ -1,8 +1,8 @@
 [Unit]
 Description=Ehdtd Daemon
-Requires=network.target networking.service
-Wants=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice
-After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice
+Requires=network.target getty.target networking.service
+Wants=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice ssh.service
+After=network.target NetworkManager.service NetworkManager-wait-online.service networking.service postgresql.service mariadb.service mysql.service local-fs.target systemd-user-sessions.service systemd-logind.service getty.target system-getty.slice rc-local.service user.slice ssh.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
